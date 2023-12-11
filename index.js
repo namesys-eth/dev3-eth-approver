@@ -27,7 +27,6 @@ export default {
 				"Access-Control-Allow-Origin": "*",
 				"Content-Type": "application/json",
 				"Cache-Control": "no-cache"
-
 			}
 		})
 	},
@@ -35,7 +34,7 @@ export default {
 		ghid = ghid.toLowerCase();
 		try {
 			const gateway = `https://${ghid}.github.io`
-			const result = await fetch(`${gateway}/test.json`).then((res) => {
+			const result = await fetch(`${gateway}/verify.json`).then((res) => {
 				console.log(res)
 				if (res.status == 200)
 					return res.json();

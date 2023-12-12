@@ -1,3 +1,6 @@
 node_modules
 scratch
+.dev.vars
 .DS_Store
+*/.DS_Store
+*/*/.DS_Store

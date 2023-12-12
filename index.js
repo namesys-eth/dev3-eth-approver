@@ -1,4 +1,6 @@
 import { privateKeyToAccount } from 'viem/accounts'
+import { getAddress, isAddress } from 'viem'
+
 export default {
 	async fetch(request, env, ctx) {
 		const url = new URL(request.url.toLowerCase());
@@ -42,14 +44,19 @@ export default {
 					throw new Error(`${res.status} - ${res.error}`)
 				}
 			})
+			let addr = result.signer;
+			if(!isAddress(result.signer)){
+				throw new Error(`${addr} is not valid address`)
+			}
+			addr = getAddress(addr);
 			const approver = privateKeyToAccount(env.PRIV_KEY)
 			const approvedSig = await approver.signMessage({
 				message: `Requesting Signature To Approve ENS Records Signer\n` +
 					`\nGateway: ${gateway}` +
 					`\nResolver: eip155:${env.CHAINID}:${env.RESOLVER}` +
-					`\nApproved Signer: eip155:${env.CHAINID}:${result.signer}`
+					`\nApproved Signer: eip155:${env.CHAINID}:${addr}`
 			});
-			return this.output(`{"Gateway":"${ghid}.github.io","ApprovedFor":"${result.signer}", "ApprovalSig":"${approvedSig}"}`, 200)
+			return this.output(`{"Gateway":"${ghid}.github.io","ApprovedFor":"${addr}", "ApprovalSig":"${approvedSig}"}`, 200)
 		} catch (error) {
 			return this.output(`{"error": "${error.message}"}`, 404);
 		}

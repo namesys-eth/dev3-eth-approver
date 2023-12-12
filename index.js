@@ -32,9 +32,9 @@ export default {
 			}
 		})
 	},
-	async generate(ghid, env) {
+	async generate(githubID, env) {
 		try {
-			const gateway = `https://${ghid}.github.io`
+			const gateway = `https://${githubID}.github.io`
 			const result = await fetch(`${gateway}/verify.json`).then((res) => {
 				if (res.status == 200)
 					return res.json();
@@ -56,7 +56,7 @@ export default {
 					`\nResolver: eip155:${env.CHAINID}:${env.RESOLVER}` +
 					`\nApproved Signer: eip155:${env.CHAINID}:${addr}`
 			});
-			return this.output(`{"Gateway":"${ghid}.github.io","ApprovedFor":"${addr}", "ApprovalSig":"${approvedSig}"}`, 200)
+			return this.output(`{"gateway":"${githubID}.github.io","signer":"${addr}", "approval":"${approvedSig}"}`, 200)
 		} catch (error) {
 			return this.output(`{"error": "${error.message}"}`, 404);
 		}

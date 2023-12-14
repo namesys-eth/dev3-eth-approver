@@ -16,16 +16,16 @@ export default {
             break;
         }
       }
-      return this.output(`{
-        "error": "Bad Request"
-      }`, 400);
+      return this.output({
+        error: "Bad Request"
+      }, 400);
     }
-    return this.output(`{
-      "error": "Method ${request.method} not allowed"
-    }`, 405);
+    return this.output({
+      error: `Method ${request.method} not allowed`
+    }, 405);
   },
   async output(data, status) {
-    return new Response(data, {
+    return new Response(JSON.stringify(data, null, 2), {
       status: status,
       headers: {
         "Allow": "GET, OPTIONS",
@@ -60,15 +60,15 @@ export default {
           `\nResolver: eip155:${env.CHAINID}:${env.RESOLVER}` +
           `\nApproved Signer: eip155:${env.CHAINID}:${addr}`
       });
-      return this.output(`{
-        "gateway": "${githubID}.github.io",
-        "signer": "${addr}",
-        "approval": "${approvedSig}"
-      }`, 200);
+      return this.output({
+        gateway: `${githubID}.github.io`,
+        approvedFor: addr,
+        approvalSig: approvedSig
+      }, 200);
     } catch (error) {
-      return this.output(`{
-        "error": "${error.message}"
-      }`, 404);
+      return this.output({
+        error: error.message
+      }, 404);
     }
   }
 };

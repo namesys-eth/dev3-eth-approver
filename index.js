@@ -1,8 +1,28 @@
 import { privateKeyToAccount } from 'viem/accounts';
 import { getAddress, isAddress } from 'viem';
 
+export class Data {
+	constructor(state) {
+		this.state = state;
+	}
+
+	async add(paths) {
+		let log = {
+			githubid: paths[2],
+			timestamp: Date.now(),
+			live: null
+		};
+		await this.state.storage.put("DATA", log);
+		return log;
+	}
+
+	async get() {
+		return this.state.storage.get("DATA");
+	}
+}
+
 export default {
-	async fetch(request, env, ctx) {
+	async fetch(request, env) {
 		const url = new URL(request.url.toLowerCase());
 		if (request.method == "OPTIONS") {
 			return this.output("", 200);
@@ -15,6 +35,19 @@ export default {
 					default:
 						break;
 				}
+			} else if (url.pathname.startsWith('/list')) {
+				let dataHandler = new Data(env);
+				let _list = await dataHandler.list();
+				return this.output(_list, 200);
+			} else if (url.pathname.startsWith('/index')) {
+				let paths = url.pathname.split("/");
+				switch (paths.length) {
+					case 3:
+						let dataHandler = new Data(env);
+						return await dataHandler.add(paths);
+					default:
+						break;
+				}
 			}
 			return this.output({
 				error: "Bad Request"
@@ -24,6 +57,7 @@ export default {
 			error: `Method ${request.method} not allowed`
 		}, 405);
 	},
+
 	async output(data, status) {
 		return new Response(JSON.stringify(data, null, 2), {
 			status: status,
@@ -36,6 +70,7 @@ export default {
 			}
 		});
 	},
+
 	async generate(githubID, env) {
 		try {
 			const gateway = `https://${githubID}.github.io`;
@@ -43,7 +78,7 @@ export default {
 				if (res.status == 200)
 					return res.json();
 				else if (res.status == 404) {
-					throw new Error(`${res.status} - ${gateway}/verify.json Not found`);
+					throw new Error(`${res.status} - ${gateway}/verify.json Not Found`);
 				} else {
 					throw new Error(`${res.status} - ${res.error}`);
 				}

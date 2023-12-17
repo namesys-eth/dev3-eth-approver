@@ -2,20 +2,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { getAddress, isAddress } from 'viem';
 
 // Counter Class
-export class Counter {
-	constructor(state, env) {
-		this.state = state;
-	}
-	async fetch(request) {
-		let value = (await this.state.storage.get("value")) || 0;
-		++value;
-		await this.state.storage.put("value", value);
-		return new Response(value);
-	}
-}
-
-// Counter Class
-export class Total {
+export class Indexer0 {
 	constructor(state, env) {
 		this.state = state;
 	}
@@ -52,7 +39,7 @@ export default {
 					case 3:
 						return this.output({
 							key: paths[2],
-							value: JSON.parse(await env.DATA.get(paths[2])),
+							value: JSON.parse(await env.DATA0.get(paths[2])),
 						}, 200);
 					default:
 						return this.output({
@@ -64,8 +51,8 @@ export default {
 				let paths = url.pathname.split("/");
 				switch (paths.length) {
 					case 2:
-						let _local = env.TOTAL.idFromName('TOTAL');
-						let _counter = env.TOTAL.get(_local);
+						let _total = env.INDEXER0.idFromName('TOTAL');
+						let _counter = env.INDEXER0.get(_total);
 						let _response = await _counter.fetch(request);
 						let _value = await _response.text();
 						return this.output({
@@ -122,25 +109,20 @@ export default {
 				message: payload
 			});
 			/// Indexer Functions
-			let _local = env.COUNTER.idFromName(githubID);
-			let counter = env.COUNTER.get(_local);
-			// Update TOTAL counter
-			if (counter === null) {
-				let total_ = env.TOTAL.idFromName('TOTAL');
-				let _total = env.TOTAL.get(total_);
-				let _response = await _total.fetch(request);
-				await _response.text();
+			let _now = JSON.parse(await env.DATA0.get(githubID))
+			// Update INDEXER0
+			if (!_now || _now === null) {
+				let _total = env.INDEXER0.idFromName('TOTAL');
+				let counter = env.INDEXER0.get(_total);
+				let response = await counter.fetch(request);
+				let index = await response.text();
+				let _value = {
+					index: index,
+					timestamp: Date.now()
+				};
+				// Put on KV_NAMESPACE
+				await env.DATA0.put(githubID, JSON.stringify(_value));
 			}
-			// Update COUNTER counter
-			let response = await counter.fetch(request);
-			let iteration = await response.text();
-			var _value = JSON.parse(await env.DATA.get(githubID)) || []
-			_value.push({
-				state: true,
-				iteration: iteration,
-				timestamp: Date.now()
-			})
-			await env.DATA.put(githubID, JSON.stringify(_value));
 			return this.output({
 				gateway: `${githubID}.github.io`,
 				payload: payload,

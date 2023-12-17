@@ -11,24 +11,17 @@ RESOLVER = "0x83c25DbcFD8d79a9E0F9f7f6cFc5b21716ACf469"
 CHAIN_ID = "5"
 
 [[kv_namespaces]]
-binding = "DATA"
-id = "cc8c8c3e37d74fcb906344f153cd8a5f"
+binding = "DATA0"
+id = "adf2bcec46804c718a62f3c0f2237a6b"
 
 [[durable_objects.bindings]]
-name = "COUNTER"
-class_name = "Counter"
-
-[[durable_objects.bindings]]
-name = "TOTAL"
-class_name = "Total"
+name = "INDEXER0"
+class_name = "Indexer0"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["Counter"]
+new_classes = ["Indexer0"]
 
-[[migrations]]
-tag = "v2"
-new_classes = ["Total"]
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv
 # [[kv_namespaces]]

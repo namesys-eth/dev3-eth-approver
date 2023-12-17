@@ -24,7 +24,11 @@ class_name = "Total"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["Counter", "Total"]
+new_classes = ["Counter"]
+
+[[migrations]]
+tag = "v2"
+new_classes = ["Total"]
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv
 # [[kv_namespaces]]

@@ -10,12 +10,17 @@ compatibility_date = "2023-11-21"
 RESOLVER = "0x83c25DbcFD8d79a9E0F9f7f6cFc5b21716ACf469"
 CHAIN_ID = "5"
 
-[durable_objects]
-bindings = [{ name = "DATA", class_name = "Data" }]
+[[kv_namespaces]]
+binding = "DATA"
+id = "cc8c8c3e37d74fcb906344f153cd8a5f"
+
+[[durable_objects.bindings]]
+name = "COUNTER"
+class_name = "Counter"
 
 [[migrations]]
-tag = "v1" # must be unique for each entry
-new_classes = ["Data"]
+tag = "v1"
+new_classes = ["Counter"]
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv
 # [[kv_namespaces]]

@@ -1,28 +1,22 @@
 import { privateKeyToAccount } from 'viem/accounts';
 import { getAddress, isAddress } from 'viem';
 
-export class Data {
-	constructor(state) {
+// Counter Class
+export class Counter {
+	constructor(state, env) {
 		this.state = state;
 	}
-
-	async add(paths) {
-		let log = {
-			githubid: paths[2],
-			timestamp: Date.now(),
-			live: null
-		};
-		await this.state.storage.put("DATA", log);
-		return log;
-	}
-
-	async get() {
-		return this.state.storage.get("DATA");
+	async fetch(request) {
+		let value = (await this.state.storage.get("value")) || 0;
+		++value;
+		await this.state.storage.put("value", value);
+		return new Response(value);
 	}
 }
 
 export default {
-	async fetch(request, env) {
+	// Handle Input
+	async fetch(request, env, ctx) {
 		const url = new URL(request.url.toLowerCase());
 		if (request.method == "OPTIONS") {
 			return this.output("", 200);
@@ -31,22 +25,23 @@ export default {
 				let paths = url.pathname.split("/");
 				switch (paths.length) {
 					case 3:
-						return await this.generate(paths[2], env);
+						return await this.generate(request, paths[2], env);
 					default:
 						break;
 				}
-			} else if (url.pathname.startsWith('/list')) {
-				let dataHandler = new Data(env);
-				let _list = await dataHandler.list();
-				return this.output(_list, 200);
-			} else if (url.pathname.startsWith('/index')) {
+			} else if (url.pathname.startsWith('/view')) {
 				let paths = url.pathname.split("/");
 				switch (paths.length) {
 					case 3:
-						let dataHandler = new Data(env);
-						return await dataHandler.add(paths);
+						return this.output({
+							key: paths[2],
+							value: JSON.parse(await env.DATA.get(paths[2])),
+						}, 200);
 					default:
-						break;
+						return this.output({
+							key: paths[2],
+							value: false,
+						}, 200);
 				}
 			}
 			return this.output({
@@ -57,7 +52,7 @@ export default {
 			error: `Method ${request.method} not allowed`
 		}, 405);
 	},
-
+	// Handle Output
 	async output(data, status) {
 		return new Response(JSON.stringify(data, null, 2), {
 			status: status,
@@ -70,22 +65,22 @@ export default {
 			}
 		});
 	},
-
-	async generate(githubID, env) {
+	// Handle Signer Validation
+	async generate(request, githubID, env) {
 		try {
 			const gateway = `https://${githubID}.github.io`;
 			const result = await fetch(`${gateway}/verify.json`).then((res) => {
 				if (res.status == 200)
 					return res.json();
 				else if (res.status == 404) {
-					throw new Error(`${res.status} - ${gateway}/verify.json Not Found`);
+					throw new Error(`${res.status}: ${gateway}/verify.json not found`);
 				} else {
-					throw new Error(`${res.status} - ${res.error}`);
+					throw new Error(`${res.status}: ${res.error}`);
 				}
 			});
 			let addr = result.signer;
 			if (!isAddress(result.signer)) {
-				throw new Error(`${addr} is not a valid address`);
+				throw new Error(`${addr} is not a valid ethereum signer`);
 			}
 			addr = getAddress(addr);
 			const approver = privateKeyToAccount(env.PRIV_KEY);
@@ -93,6 +88,15 @@ export default {
 			const approvedSig = await approver.signMessage({
 				message: payload
 			});
+			let id = env.COUNTER.idFromName('DATA');
+			let counter = env.COUNTER.get(id);
+			let response = await counter.fetch(request);
+			let index = await response.text();
+			await env.DATA.put(githubID, JSON.stringify({
+				state: true,
+				index: index,
+				timestamp: Date.now()
+			}));
 			return this.output({
 				gateway: `${githubID}.github.io`,
 				payload: payload,

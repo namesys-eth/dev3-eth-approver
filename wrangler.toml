@@ -18,9 +18,13 @@ id = "cc8c8c3e37d74fcb906344f153cd8a5f"
 name = "COUNTER"
 class_name = "Counter"
 
+[[durable_objects.bindings]]
+name = "TOTAL"
+class_name = "Total"
+
 [[migrations]]
 tag = "v1"
-new_classes = ["Counter"]
+new_classes = ["Counter", "Total"]
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv
 # [[kv_namespaces]]

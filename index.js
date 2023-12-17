@@ -7,11 +7,25 @@ export class Counter {
 		this.state = state;
 	}
 	async fetch(request) {
-		const url = new URL(request.url.toLowerCase());
-		let paths = url.pathname.split("/");
 		let value = (await this.state.storage.get("value")) || 0;
 		++value;
 		await this.state.storage.put("value", value);
+		return new Response(value);
+	}
+}
+
+// Counter Class
+export class Total {
+	constructor(state, env) {
+		this.state = state;
+	}
+	async fetch(request) {
+		const url = new URL(request.url.toLowerCase());
+		let value = (await this.state.storage.get("value")) || 0;
+		if (url.pathname.startsWith('/verify')) {
+			++value;
+			await this.state.storage.put("value", value);
+		}
 		return new Response(value);
 	}
 }
@@ -44,6 +58,22 @@ export default {
 						return this.output({
 							key: paths[2],
 							value: false,
+						}, 200);
+				}
+			} else if (url.pathname.startsWith('/count')) {
+				let paths = url.pathname.split("/");
+				switch (paths.length) {
+					case 2:
+						let _local = env.TOTAL.idFromName('TOTAL');
+						let _counter = env.TOTAL.get(_local);
+						let _response = await _counter.fetch(request);
+						let _value = await _response.text();
+						return this.output({
+							total: _value,
+						}, 200);
+					default:
+						return this.output({
+							total: null
 						}, 200);
 				}
 			}
@@ -91,15 +121,26 @@ export default {
 			const approvedSig = await approver.signMessage({
 				message: payload
 			});
-			let id = env.COUNTER.idFromName(githubID);
-			let counter = env.COUNTER.get(id);
+			/// Indexer Functions
+			let _local = env.COUNTER.idFromName(githubID);
+			let _exists = env.COUNTER.get(_local);
+			// Update TOTAL counter
+			if (_exists === null) {
+				let total_ = env.TOTAL.idFromName('TOTAL');
+				let _total = env.TOTAL.get(total_);
+				await _total.fetch(request);
+			}
+			let counter = env.COUNTER.get(_local);
+			// Update COUNTER counter
 			let response = await counter.fetch(request);
-			let index = await response.text();
-			await env.DATA.put(githubID, JSON.stringify({
+			let iteration = await response.text();
+			var _value = JSON.parse(await env.DATA.get(githubID)) || []
+			_value.push({
 				state: true,
-				index: index,
+				iteration: iteration,
 				timestamp: Date.now()
-			}));
+			})
+			await env.DATA.put(githubID, JSON.stringify(_value));
 			return this.output({
 				gateway: `${githubID}.github.io`,
 				payload: payload,

@@ -7,6 +7,8 @@ export class Counter {
 		this.state = state;
 	}
 	async fetch(request) {
+		const url = new URL(request.url.toLowerCase());
+		let paths = url.pathname.split("/");
 		let value = (await this.state.storage.get("value")) || 0;
 		++value;
 		await this.state.storage.put("value", value);
@@ -14,6 +16,7 @@ export class Counter {
 	}
 }
 
+// Main
 export default {
 	// Handle Input
 	async fetch(request, env, ctx) {
@@ -88,7 +91,7 @@ export default {
 			const approvedSig = await approver.signMessage({
 				message: payload
 			});
-			let id = env.COUNTER.idFromName('DATA');
+			let id = env.COUNTER.idFromName(githubID);
 			let counter = env.COUNTER.get(id);
 			let response = await counter.fetch(request);
 			let index = await response.text();

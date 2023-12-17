@@ -8,7 +8,7 @@ compatibility_date = "2023-11-21"
 # Docs: https://developers.cloudflare.com/workers/platform/environment-variables
 [vars]
 # MY_VARIABLE = "production_value"
-RESOLVER="0x83c25dbcfd8d79a9e0f9f7f6cfc5b21716acf469"
+RESOLVER="0x83c25DbcFD8d79a9E0F9f7f6cFc5b21716ACf469"
 CHAIN_ID="5"
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.

@@ -123,14 +123,14 @@ export default {
 			});
 			/// Indexer Functions
 			let _local = env.COUNTER.idFromName(githubID);
-			let _exists = env.COUNTER.get(_local);
+			let counter = env.COUNTER.get(_local);
 			// Update TOTAL counter
-			if (_exists === null) {
+			if (counter === null) {
 				let total_ = env.TOTAL.idFromName('TOTAL');
 				let _total = env.TOTAL.get(total_);
-				await _total.fetch(request);
+				let _response = await _total.fetch(request);
+				await _response.text();
 			}
-			let counter = env.COUNTER.get(_local);
 			// Update COUNTER counter
 			let response = await counter.fetch(request);
 			let iteration = await response.text();

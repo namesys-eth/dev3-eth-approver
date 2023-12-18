@@ -18,6 +18,10 @@ id = "dbd52abc12d24fd0b1e7c70a4576df83"
 name = "INDEXER"
 class_name = "Indexer"
 
+[[durable_objects.bindings]]
+name = "INDEXER0"
+class_name = "Indexe0"
+
 [[migrations]]
 tag = "v1"
 new_classes = ["Indexer"]

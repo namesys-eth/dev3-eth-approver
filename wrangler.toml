@@ -7,20 +7,21 @@ compatibility_date = "2023-11-21"
 # Note: Use secrets to store sensitive data.
 # Docs: https://developers.cloudflare.com/workers/platform/environment-variables
 [vars]
-RESOLVER = "0x58BBB1e1d2552d81615C67Afc41aFE07D00204De"
-CHAIN_ID = "5"
+RESOLVER = "0x37ca355e75a72F4f467f780916DdF5dD90A46592"
+CHAIN_ID = "1"
 
 [[kv_namespaces]]
-binding = "DATA0"
-id = "adf2bcec46804c718a62f3c0f2237a6b"
+binding = "DATA"
+id = "dbd52abc12d24fd0b1e7c70a4576df83"
 
 [[durable_objects.bindings]]
-name = "INDEXER0"
-class_name = "Indexer0"
+name = "INDEXER"
+class_name = "Indexer"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["Indexer0"]
+new_classes = ["Indexer"]
+deleted_classes = ["Indexer0"]
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv

@@ -2,7 +2,7 @@ import { privateKeyToAccount } from 'viem/accounts';
 import { getAddress, isAddress } from 'viem';
 
 // Counter Class
-export class Indexer0 {
+export class Indexer {
 	constructor(state, env) {
 		this.state = state;
 	}
@@ -39,7 +39,7 @@ export default {
 					case 3:
 						return this.output({
 							key: paths[2],
-							value: JSON.parse(await env.DATA0.get(paths[2])),
+							value: JSON.parse(await env.DATA.get(paths[2])),
 						}, 200);
 					default:
 						return this.output({
@@ -51,8 +51,8 @@ export default {
 				let paths = url.pathname.split("/");
 				switch (paths.length) {
 					case 2:
-						let _total = env.INDEXER0.idFromName('TOTAL');
-						let _counter = env.INDEXER0.get(_total);
+						let _total = env.INDEXER.idFromName('TOTAL');
+						let _counter = env.INDEXER.get(_total);
 						let _response = await _counter.fetch(request);
 						let _value = await _response.text();
 						return this.output({
@@ -109,11 +109,11 @@ export default {
 				message: payload
 			});
 			/// Indexer Functions
-			let _now = JSON.parse(await env.DATA0.get(githubID))
-			// Update INDEXER0
+			let _now = JSON.parse(await env.DATA.get(githubID))
+			// Update INDEXER
 			if (!_now || _now === null) {
-				let _total = env.INDEXER0.idFromName('TOTAL');
-				let counter = env.INDEXER0.get(_total);
+				let _total = env.INDEXER.idFromName('TOTAL');
+				let counter = env.INDEXER.get(_total);
 				let response = await counter.fetch(request);
 				let index = await response.text();
 				let _value = {
@@ -121,7 +121,7 @@ export default {
 					timestamp: Date.now()
 				};
 				// Put on KV_NAMESPACE
-				await env.DATA0.put(githubID, JSON.stringify(_value));
+				await env.DATA.put(githubID, JSON.stringify(_value));
 			}
 			return this.output({
 				gateway: `${githubID}.github.io`,

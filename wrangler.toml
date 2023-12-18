@@ -18,14 +18,9 @@ id = "dbd52abc12d24fd0b1e7c70a4576df83"
 name = "INDEXER"
 class_name = "Indexer"
 
-[[durable_objects.bindings]]
-name = "INDEXER0"
-class_name = "Indexer0"
-
 [[migrations]]
 tag = "v1"
 new_classes = ["Indexer"]
-deleted_classes = ["Indexer0"]
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv

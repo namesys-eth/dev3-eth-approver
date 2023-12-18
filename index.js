@@ -17,6 +17,22 @@ export class Indexer {
 	}
 }
 
+// Counter Class
+export class Indexer0 {
+	constructor(state, env) {
+		this.state = state;
+	}
+	async fetch(request) {
+		const url = new URL(request.url.toLowerCase());
+		let value = (await this.state.storage.get("value")) || 0;
+		if (url.pathname.startsWith('/verify')) {
+			++value;
+			await this.state.storage.put("value", value);
+		}
+		return new Response(value);
+	}
+}
+
 // Main
 export default {
 	// Handle Input
